@@ -75,6 +75,18 @@ void SetPixel(vector<Color>& pixels, size_t x, size_t y, Color color) {
     pixels[Idx(x, y)] = color;
 }
 
+void DrawLine(vector<Color>& pixels, size_t x0, size_t y0, size_t x1, size_t y1, Color color) {
+    if (x0 >= WIDTH || y0 >= HEIGHT || x1 >= WIDTH || y1 >= HEIGHT) {
+        std::cout << "Out of bounds\n";
+        return;
+    }
+    float dy = (float)y1 - y0;
+    float dx = (float)x1 - x0;
+    float slope = dy / dx;
+    for (size_t i = x0; i < x1; i++)
+        SetPixel(pixels, i, slope * i, color);
+}
+
 int main() {
     vector<Color> pixels(WIDTH * HEIGHT);
 
@@ -90,7 +102,6 @@ int main() {
 
     bool running = true;
     SDL_Event event;
-    float slope = (float)HEIGHT / WIDTH;
     while (running) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT)
@@ -101,15 +112,7 @@ int main() {
                     running = false;
             }
         }
-        SetPixel(pixels, 400, 300, Color {255, 0, 0, 255});
-        SetPixel(pixels, 0, 0, Color {255, 0, 0, 255});
-        SetPixel(pixels, 0, 599, Color {255, 0, 0, 255});
-        SetPixel(pixels, 799, 0, Color {255, 0, 0, 255});
-        SetPixel(pixels, 799, 599, Color {255, 0, 0, 255});
-
-        for (size_t i = 0; i < WIDTH; i++) {
-            SetPixel(pixels, i, slope * i, Color {255, 0, 0, 255});
-        }
+        DrawLine(pixels, 0, 0, 799, 599, Color {255, 0, 0, 255});
 
         SDL_UpdateTexture(texture, nullptr, pixels.data(), WIDTH * sizeof(Color));
         SDL_RenderClear(renderer);
