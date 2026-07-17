@@ -90,6 +90,7 @@ int main() {
 
     bool running = true;
     SDL_Event event;
+    float slope = (float)HEIGHT / WIDTH;
     while (running) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT)
@@ -106,8 +107,8 @@ int main() {
         SetPixel(pixels, 799, 0, Color {255, 0, 0, 255});
         SetPixel(pixels, 799, 599, Color {255, 0, 0, 255});
 
-        for (size_t i = 0; i < HEIGHT; i++) {
-            SetPixel(pixels, i, i, Color {255, 0, 0, 255});
+        for (size_t i = 0; i < WIDTH; i++) {
+            SetPixel(pixels, i, slope * i, Color {255, 0, 0, 255});
         }
 
         SDL_UpdateTexture(texture, nullptr, pixels.data(), WIDTH * sizeof(Color));
