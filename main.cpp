@@ -3,8 +3,8 @@
 #include <SDL3/SDL.h>
 
 using u8 = uint8_t;
-constexpr size_t WIDTH = 800;
-constexpr size_t HEIGHT = 600;
+constexpr int WIDTH = 800;
+constexpr int HEIGHT = 600;
 
 void InitSDL() {
     if (SDL_Init(SDL_INIT_VIDEO))
@@ -62,29 +62,43 @@ struct Color {
     u8 a;
 };
 
-size_t Idx(size_t x, size_t y) {
+int Idx(int x, int y) {
     return y * WIDTH + x;
 }
 
 using std::vector;
-void SetPixel(vector<Color>& pixels, size_t x, size_t y, Color color) {
-    if (x >= WIDTH || y >= HEIGHT) {
+void SetPixel(vector<Color>& pixels, int x, int y, Color color) {
+    if (x < 0 || y < 0 || x >= WIDTH || y >= HEIGHT) {
         std::cout << "Out of bounds\nx: " << x << "\ny: " << y << std::endl;
         return;
     }
     pixels[Idx(x, y)] = color;
 }
 
-void DrawLine(vector<Color>& pixels, size_t x0, size_t y0, size_t x1, size_t y1, Color color) {
+void DrawLine(vector<Color>& pixels, int x0, int y0, int x1, int y1, Color color) {
+    using std::max, std::abs;
     if (x0 >= WIDTH || y0 >= HEIGHT || x1 >= WIDTH || y1 >= HEIGHT) {
         std::cout << "Out of bounds\n";
         return;
     }
-    float dy = (float)y1 - y0;
-    float dx = (float)x1 - x0;
-    float slope = dy / dx;
-    for (size_t i = x0; i < x1; i++)
-        SetPixel(pixels, i, slope * i, color);
+
+    float dy = y1 - y0, dx = x1 - x0;
+    int steps = max(abs(dx), abs(dy));
+
+    if (steps == 0) {
+        SetPixel(pixels, x0, y0, color);
+        return;
+    }
+
+    dy /= steps;
+    dx /= steps;
+
+    float y = y0, x = x0;
+    for (int i = 0; i <= steps; i++) {
+        SetPixel(pixels, x, y, color);
+        y += dy;
+        x += dx;
+    }
 }
 
 int main() {
@@ -96,7 +110,7 @@ int main() {
     auto texture = CreateTexture(renderer);
 
     Color my_color {28, 232, 179, 255};
-    for (size_t i = 0; i < WIDTH * HEIGHT; i++) {
+    for (int i = 0; i < WIDTH * HEIGHT; i++) {
         pixels[i] = my_color;
     }
 
