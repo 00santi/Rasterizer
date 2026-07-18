@@ -1,8 +1,6 @@
 #include "window.h"
 #include <iostream>
-
-constexpr int WIDTH = 800;
-constexpr int HEIGHT = 600;
+#include "types.h"
 
 void InitSDL() {
     if (SDL_Init(SDL_INIT_VIDEO))
