@@ -17,6 +17,6 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(SDL3)
 
-add_executable(Rasterizer main.cpp)
+add_executable(Rasterizer src/main.cpp src/window.cpp)
 
 target_link_libraries(Rasterizer PRIVATE SDL3::SDL3-static)
