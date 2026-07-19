@@ -1,26 +1,11 @@
 #include <iostream>
 #include <vector>
 #include <SDL3/SDL.h>
-#include "window.h"
-#include "types.h"
+#include "window.hpp"
+#include "types.hpp"
+#include "utils.hpp"
 
 using std::vector, std::min, std::max, std::abs;
-
-int Idx(int x, int y) {
-    return y * WIDTH + x;
-}
-
-void SetPixel(vector<Color>& pixels, int x, int y, Color color) {
-    if (x < 0 || y < 0 || x >= WIDTH || y >= HEIGHT) {
-        std::cout << "Out of bounds, x: " << x << ", y: " << y << std::endl;
-        return;
-    }
-    pixels[Idx(x, y)] = color;
-}
-
-void SetPixel(vector<Color>& pixels, Point p, Color color) {
-    SetPixel(pixels, p.x, p.y, color);
-}
 
 void DrawLine(vector<Color>& pixels, int x0, int y0, int x1, int y1, Color color) {
     if (x0 >= WIDTH || y0 >= HEIGHT || x1 >= WIDTH || y1 >= HEIGHT) {
@@ -55,6 +40,10 @@ int EdgeFunction(int ax, int ay, int bx, int by, int px, int py) {
     return (px - ax) * (by - ay) - (py - ay) * (bx - ax);
 }
 
+int EdgeFunction(Point a, Point b, Point c) {
+    return EdgeFunction(a.x, a.y, b.x, b.y, c.x, c.y);
+}
+
 bool InsideTriangle(Triangle t, int px, int py) {
     const Point a = t.a, b = t.b, c = t.c;
     int e0 = EdgeFunction(a.x, a.y, b.x, b.y, px, py);
@@ -78,11 +67,6 @@ void DrawTriangle(vector<Color>& pixels, Triangle t, Color color) {
     }
 }
 
-void Clear(vector<Color>& pixels, Color color) {
-    for (auto& pixel : pixels)
-        pixel = color;
-}
-
 int main() {
     vector<Color> pixels(WIDTH * HEIGHT);
 
@@ -90,8 +74,6 @@ int main() {
     auto window = CreateWindow();
     auto renderer = CreateRenderer(window);
     auto texture = CreateTexture(renderer);
-
-    Clear(pixels, green);
 
     bool running = true;
     SDL_Event event;

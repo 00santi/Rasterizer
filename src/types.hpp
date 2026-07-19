@@ -22,7 +22,12 @@ struct Triangle {
     Point c {};
 };
 
+struct Vertex {
+    int x = 0;
+    int y = 0;
+    Color color{};
+};
+
 inline constexpr Color green {28, 232, 179, 255};
 inline constexpr Color black {0, 0, 0, 255};
 inline constexpr Color red {150, 0, 0, 255};
-
