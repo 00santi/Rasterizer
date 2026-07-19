@@ -28,6 +28,14 @@ struct Vertex {
     Color color{};
 };
 
+struct VertexTriangle {
+    Vertex a {};
+    Vertex b {};
+    Vertex c {};
+};
+
 inline constexpr Color green {28, 232, 179, 255};
 inline constexpr Color black {0, 0, 0, 255};
 inline constexpr Color red {150, 0, 0, 255};
+inline constexpr Color white {255, 255, 255, 255};
+inline constexpr Color purple {148, 62, 143, 255};
