@@ -16,19 +16,13 @@ struct Point {
     int y = 0;
 };
 
-struct Triangle {
-    Point a {};
-    Point b {};
-    Point c {};
-};
-
 struct Vertex {
     int x = 0;
     int y = 0;
     Color color{};
 };
 
-struct VertexTriangle {
+struct Triangle {
     Vertex a {};
     Vertex b {};
     Vertex c {};
