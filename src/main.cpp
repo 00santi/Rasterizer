@@ -7,13 +7,13 @@
 
 using std::vector, std::min, std::max, std::abs, std::tuple;
 
-void DrawLine(vector<Color>& pixels, int x0, int y0, int x1, int y1, Color color) {
+void DrawLine(vector<Color>& pixels, float x0, float y0, float x1, float y1, Color color) {
     if (x0 >= WIDTH || y0 >= HEIGHT || x1 >= WIDTH || y1 >= HEIGHT) {
         std::cout << "Out of bounds\n";
         return;
     }
 
-    const int dy = y1 - y0, dx = x1 - x0;
+    const float dy = y1 - y0, dx = x1 - x0;
     const int steps = max(abs(dx), abs(dy));
 
     if (steps == 0) {
@@ -21,8 +21,8 @@ void DrawLine(vector<Color>& pixels, int x0, int y0, int x1, int y1, Color color
         return;
     }
 
-    const float ystep = static_cast<float>(dy) / steps;
-    const float xstep = static_cast<float>(dx) / steps;
+    const float ystep = dy / steps;
+    const float xstep = dx / steps;
 
     float y = y0, x = x0;
     for (int i = 0; i <= steps; i++) {
@@ -36,22 +36,22 @@ void DrawLine(vector<Color>& pixels, Point p1, Point p2, Color color) {
     DrawLine(pixels, p1.x, p1.y, p2.x, p2.y, color);
 }
 
-int EdgeFunction(int ax, int ay, int bx, int by, int px, int py) {
+float EdgeFunction(float ax, float ay, float bx, float by, float px, float py) {
     return (px - ax) * (by - ay) - (py - ay) * (bx - ax);
 }
 
-int EdgeFunction(Point a, Point b, Point c) {
+float EdgeFunction(Point a, Point b, Point c) {
     return EdgeFunction(a.x, a.y, b.x, b.y, c.x, c.y);
 }
 
 tuple<bool, float, float, float> InsideTriangle(Triangle t, int px, int py) {
     const Vertex a = t.a, b = t.b, c = t.c;
-    const int e0 = EdgeFunction(a.x, a.y, b.x, b.y, px, py);
-    const int e1 = EdgeFunction(b.x, b.y, c.x, c.y, px, py);
-    const int e2 = EdgeFunction(c.x, c.y, a.x, a.y, px, py);
+    const float e0 = EdgeFunction(a.x, a.y, b.x, b.y, px, py);
+    const float e1 = EdgeFunction(b.x, b.y, c.x, c.y, px, py);
+    const float e2 = EdgeFunction(c.x, c.y, a.x, a.y, px, py);
 
     const bool inside = (e0 >= 0 && e1 >= 0 && e2 >= 0) || (e0 <= 0 && e1 <= 0 && e2 <= 0);
-    const float area = static_cast<float>(EdgeFunction(a.x, a.y, b.x, b.y, c.x, c.y));
+    const float area = EdgeFunction(a.x, a.y, b.x, b.y, c.x, c.y);
     if (area == 0 || !inside) return tuple{false, 0, 0, 0};
     return { inside, e1 / area, e2 / area, e0 / area };
 }
@@ -73,6 +73,38 @@ void DrawTriangle(vector<Color>& pixels, Triangle t) {
             SetPixel(pixels, x, y, Color{R, G, B, 255});
         }
     }
+}
+
+tuple<float, float> Centroid(Triangle t) {
+    float x = t.a.x + t.b.x + t.c.x;
+    float y = t.a.y + t.b.y + t.c.y;
+    x /= 3;
+    y /= 3;
+    return { x, y };
+}
+
+Triangle ApplyTransform(Triangle t, Transform transform) {
+    auto [Gx, Gy] = Centroid(t);
+
+    float ax = Gx + transform.scale * (t.a.x - Gx);
+    float ay = Gy + transform.scale * (t.a.y - Gy);
+    float bx = Gx + transform.scale * (t.b.x - Gx);
+    float by = Gy + transform.scale * (t.b.y - Gy);
+    float cx = Gx + transform.scale * (t.c.x - Gx);
+    float cy = Gy + transform.scale * (t.c.y - Gy);
+
+    ax += transform.x;
+    ay += transform.y;
+    bx += transform.x;
+    by += transform.y;
+    cx += transform.x;
+    cy += transform.y;
+
+    return {
+        {ax, ay, t.a.color},
+        {bx, by, t.b.color},
+        {cx, cy, t.c.color},
+    };
 }
 
 int main() {

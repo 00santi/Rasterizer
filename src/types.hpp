@@ -12,13 +12,13 @@ struct Color {
 };
 
 struct Point {
-    int x = 0;
-    int y = 0;
+    float x = 0;
+    float y = 0;
 };
 
 struct Vertex {
-    int x = 0;
-    int y = 0;
+    float x = 0;
+    float y = 0;
     Color color{};
 };
 
@@ -26,6 +26,12 @@ struct Triangle {
     Vertex a {};
     Vertex b {};
     Vertex c {};
+};
+
+struct Transform {
+    float x = 0;
+    float y = 0;
+    float scale = 1.0f;
 };
 
 inline constexpr Color green {28, 232, 179, 255};
