@@ -4,6 +4,7 @@
 #include "window.hpp"
 #include "types.hpp"
 #include "utils.hpp"
+#include "constants.hpp"
 
 using std::vector, std::min, std::max, std::abs, std::tuple;
 
@@ -75,7 +76,7 @@ void DrawTriangle(vector<Color>& pixels, Triangle t) {
     }
 }
 
-tuple<float, float> Centroid(Triangle t) {
+Point Centroid(Triangle t) {
     float x = t.a.x + t.b.x + t.c.x;
     float y = t.a.y + t.b.y + t.c.y;
     x /= 3;
@@ -83,7 +84,7 @@ tuple<float, float> Centroid(Triangle t) {
     return { x, y };
 }
 
-Triangle ApplyTransform(Triangle t, Transform transform) {
+Triangle ApplyTranslation_Scale(Triangle t, Translation_Scale transform) {
     auto [Gx, Gy] = Centroid(t);
 
     float ax = Gx + transform.scale * (t.a.x - Gx);
@@ -105,6 +106,10 @@ Triangle ApplyTransform(Triangle t, Transform transform) {
         {bx, by, t.b.color},
         {cx, cy, t.c.color},
     };
+}
+
+Triangle ApplyTransform(Triangle t, Transform transform) {
+    return {};
 }
 
 int main() {

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include "types.hpp"
+#include "constants.hpp"
 
 inline int Idx(int x, int y) {
     return y * WIDTH + x;

@@ -1,6 +1,6 @@
 #include <iostream>
 #include "window.hpp"
-#include "types.hpp"
+#include "constants.hpp"
 
 void InitSDL() {
     if (SDL_Init(SDL_INIT_VIDEO))

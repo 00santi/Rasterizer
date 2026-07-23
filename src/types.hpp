@@ -1,8 +1,7 @@
 #pragma once
+#include <cstdint>
 
-using u8 = uint8_t;
-inline constexpr int WIDTH = 800;
-inline constexpr int HEIGHT = 600;
+using u8 = std::uint8_t;
 
 struct Color {
     u8 r = 0;
@@ -28,14 +27,19 @@ struct Triangle {
     Vertex c {};
 };
 
-struct Transform {
+struct Translation_Scale {
     float x = 0;
     float y = 0;
     float scale = 1.0f;
 };
 
-inline constexpr Color green {28, 232, 179, 255};
-inline constexpr Color black {0, 0, 0, 255};
-inline constexpr Color red {150, 0, 0, 255};
-inline constexpr Color white {255, 255, 255, 255};
-inline constexpr Color purple {148, 62, 143, 255};
+struct Vec3 {
+    float x = 0;
+    float y = 0;
+    float z = 0;
+};
+
+using Mat3 = float[3][3];
+using Transform = Mat3;
+
+Vec3 Multiply(Mat3 a, Vec3 b);
