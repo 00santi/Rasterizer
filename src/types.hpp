@@ -32,12 +32,6 @@ struct Triangle {
     Vertex c {};
 };
 
-struct Translation_Scale {
-    float x = 0;
-    float y = 0;
-    float scale = 1.0f;
-};
-
 using Mat3 = float[3][3];
 using Transform = Mat3;
 

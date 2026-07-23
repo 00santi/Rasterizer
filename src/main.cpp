@@ -84,45 +84,29 @@ Point Centroid(Triangle t) {
     return { x, y };
 }
 
-Triangle ApplyTranslation_Scale(Triangle t, Translation_Scale transform) {
-    auto [Gx, Gy] = Centroid(t);
-
-    float ax = Gx + transform.scale * (t.a.position.x - Gx);
-    float ay = Gy + transform.scale * (t.a.position.y - Gy);
-    float bx = Gx + transform.scale * (t.b.position.x - Gx);
-    float by = Gy + transform.scale * (t.b.position.y - Gy);
-    float cx = Gx + transform.scale * (t.c.position.x - Gx);
-    float cy = Gy + transform.scale * (t.c.position.y - Gy);
-
-    ax += transform.x;
-    ay += transform.y;
-    bx += transform.x;
-    by += transform.y;
-    cx += transform.x;
-    cy += transform.y;
-
+Vertex ApplyTransform (Vertex v, Transform t) {
+    Vec3 pos = v.position;
     return {
-        {{ax, ay, 1}, t.a.color},
-        {{bx, by, 1}, t.b.color},
-        {{cx, cy, 1}, t.c.color},
+        Multiply(t, pos),
+        v.color
     };
 }
 
 Triangle ApplyTransform(Triangle t, Transform transform) {
-    Vec3 apos = t.a.position;
-    Vec3 bpos = t.b.position;
-    Vec3 cpos = t.c.position;
+    Vertex avex = ApplyTransform(t.a, transform);
+    Vertex bvex = ApplyTransform(t.b, transform);
+    Vertex cvex = ApplyTransform(t.c, transform);
 
-    apos = Multiply(transform, apos);
-    bpos = Multiply(transform, bpos);
-    cpos = Multiply(transform, cpos);
-
-    Vertex avex {apos, t.a.color};
-    Vertex bvex {bpos, t.b.color};
-    Vertex cvex {cpos, t.c.color};
-
-    return {avex, bvex, cvex, };
+    return {avex, bvex, cvex };
 }
+
+/*Transform Make2dTranslation(float x, float y) {
+    return{
+        {1, 0, x},
+        {0, 1, y},
+        {0, 0, 1}
+    };
+}*/
 
 int main() {
     vector<Color> pixels(WIDTH * HEIGHT);
@@ -158,12 +142,20 @@ int main() {
         };
         DrawTriangle(pixels, triangle);
 
-        Triangle vt {
+        Triangle triangle2 {
             {{700, 25, 1}, red },
             {{400, 50, 1},green },
             {{600, 250, 1}, purple }
         };
-        DrawTriangle(pixels, vt);
+        DrawTriangle(pixels, triangle2);
+
+        Transform translation = {
+            {1, 0, -300},
+            {0, 1, 10},
+            {0, 0, 1}
+        };
+        Triangle triangle3 = ApplyTransform(triangle2, translation);
+        DrawTriangle(pixels, triangle3);
 
         SDL_UpdateTexture(texture, nullptr, pixels.data(), WIDTH * sizeof(Color));
         SDL_RenderClear(renderer);
