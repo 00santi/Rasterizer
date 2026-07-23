@@ -15,9 +15,14 @@ struct Point {
     float y = 0;
 };
 
-struct Vertex {
+struct Vec3 {
     float x = 0;
     float y = 0;
+    float z = 0;
+};
+
+struct Vertex {
+    Vec3 position;
     Color color{};
 };
 
@@ -31,12 +36,6 @@ struct Translation_Scale {
     float x = 0;
     float y = 0;
     float scale = 1.0f;
-};
-
-struct Vec3 {
-    float x = 0;
-    float y = 0;
-    float z = 0;
 };
 
 using Mat3 = float[3][3];
