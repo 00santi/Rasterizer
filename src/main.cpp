@@ -100,13 +100,15 @@ Triangle ApplyTransform(Triangle t, Transform transform) {
     return {avex, bvex, cvex };
 }
 
-/*Transform Make2dTranslation(float x, float y) {
-    return{
+Triangle Translate(Triangle t, float x, float y) {
+    Transform transform {
         {1, 0, x},
         {0, 1, y},
         {0, 0, 1}
     };
-}*/
+
+    return ApplyTransform(t, transform);
+}
 
 int main() {
     vector<Color> pixels(WIDTH * HEIGHT);
@@ -149,12 +151,7 @@ int main() {
         };
         DrawTriangle(pixels, triangle2);
 
-        Transform translation = {
-            {1, 0, -300},
-            {0, 1, 10},
-            {0, 0, 1}
-        };
-        Triangle triangle3 = ApplyTransform(triangle2, translation);
+        Triangle triangle3 = Translate(triangle2, -300, 10);
         DrawTriangle(pixels, triangle3);
 
         SDL_UpdateTexture(texture, nullptr, pixels.data(), WIDTH * sizeof(Color));
