@@ -6,7 +6,7 @@
 #include "utils.hpp"
 #include "constants.hpp"
 
-using std::vector, std::min, std::max, std::abs, std::tuple;
+using std::vector, std::min, std::max, std::abs, std::tuple, std::sin, std::cos;
 
 void DrawLine(vector<Color>& pixels, float x0, float y0, float x1, float y1, Color color) {
     if (x0 >= WIDTH || y0 >= HEIGHT || x1 >= WIDTH || y1 >= HEIGHT) {
@@ -110,6 +110,19 @@ Triangle Translate(Triangle t, float x, float y) {
     return ApplyTransform(t, transform);
 }
 
+float DegToRad(float degrees) {
+    return degrees * 0.0174533f;
+}
+
+Triangle Rotate(Triangle t, float radians) {
+    Transform transform {
+        {cos(radians), -sin(radians), 0},
+        {sin(radians), cos(radians), 0},
+        {0, 0, 1},
+    };
+    return ApplyTransform(t, transform);
+}
+
 int main() {
     vector<Color> pixels(WIDTH * HEIGHT);
 
@@ -153,6 +166,10 @@ int main() {
 
         Triangle triangle3 = Translate(triangle2, -300, 10);
         DrawTriangle(pixels, triangle3);
+
+        Triangle triangle4 = Translate(triangle3, 0, 300);
+        triangle4 = Rotate(triangle4, DegToRad(30));
+        DrawTriangle(pixels, triangle4);
 
         SDL_UpdateTexture(texture, nullptr, pixels.data(), WIDTH * sizeof(Color));
         SDL_RenderClear(renderer);
