@@ -84,10 +84,10 @@ Point Centroid(Triangle t) {
     return { x, y };
 }
 
-Vertex ApplyTransform (Vertex v, Transform t) {
+Vertex ApplyTransform (Vertex v, Transform transform) {
     Vec3 pos = v.position;
     return {
-        Multiply(t, pos),
+        Multiply(transform, pos),
         v.color
     };
 }

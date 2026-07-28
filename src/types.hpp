@@ -32,7 +32,12 @@ struct Triangle {
     Vertex c {};
 };
 
-using Mat3 = float[3][3];
+struct Mat3 {
+    Vec3 a {};
+    Vec3 b {};
+    Vec3 c {};
+};
 using Transform = Mat3;
 
-Vec3 Multiply(Mat3 a, Vec3 b);
+Vec3 Multiply(Mat3 A, Vec3 b);
+Mat3 Multiply(Mat3 a, Mat3 b);
