@@ -39,5 +39,6 @@ struct Mat3 {
 };
 using Transform = Mat3;
 
-Vec3 Multiply(Mat3 A, Vec3 b);
-Mat3 Multiply(Mat3 a, Mat3 b);
+Vec3 Multiply(const Mat3& A, const Vec3& b);
+Mat3 Multiply(const Mat3& A, const Mat3& B);
+float Dot(const Vec3& a, const Vec3& b);
