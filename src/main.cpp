@@ -109,17 +109,20 @@ float DegToRad(float degrees) {
     return degrees * 0.0174533f;
 }
 
-Triangle Rotate(Triangle t, float radians) {
-    Point centroid = Centroid(t);
-    t = Translate(t, -centroid.x, -centroid.y);
+Triangle Rotate(Triangle t, Point pivot, float radians) {
+    t = Translate(t, -pivot.x, -pivot.y);
 
     Transform rotation {
-        {cos(radians), -sin(radians), 0},
-        {sin(radians), cos(radians), 0},
-        {0, 0, 1},
-    };
+            {cos(radians), -sin(radians), 0},
+            {sin(radians), cos(radians), 0},
+            {0, 0, 1},
+        };
     t = ApplyTransform(t, rotation);
-    return Translate(t, centroid.x, centroid.y);
+    return Translate(t, pivot.x, pivot.y);
+}
+
+Triangle Rotate(Triangle t, float radians) {
+    return Rotate(t, Centroid(t), radians);
 }
 
 int main() {
@@ -167,7 +170,7 @@ int main() {
         DrawTriangle(pixels, triangle3);
 
         Triangle triangle4 = Translate(triangle3, 0, 300);
-        triangle4 = Rotate(triangle4, DegToRad(30));
+        triangle4 = Rotate(triangle4, DegToRad(115));
         DrawTriangle(pixels, triangle4);
 
         SDL_UpdateTexture(texture, nullptr, pixels.data(), WIDTH * sizeof(Color));
