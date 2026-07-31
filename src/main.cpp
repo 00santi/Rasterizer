@@ -85,7 +85,13 @@ Triangle Rotate(Triangle t, float radians) {
 }
 
 Triangle Scale(Triangle t, float scale) {
-    return ApplyTransform(t, Escalation(scale));
+    Point centroid = Centroid(t);
+    Transform to_origin = Translation(-centroid.x, -centroid.y);
+    Transform escalation = Escalation(scale);
+    Transform to_original = Translation(centroid.x, centroid.y);
+    Transform transform = Multiply(to_original, Multiply(escalation, to_origin));
+
+    return ApplyTransform(t, transform);
 }
 
 int main() {
@@ -134,6 +140,7 @@ int main() {
         DrawTriangle(pixels, triangle3);
 
         Triangle triangle4 = Translate(triangle3, 0, 300);
+        triangle4 = Scale(triangle4, 1.3);
         triangle4 = Rotate(triangle4, DegToRad(115));
         DrawTriangle(pixels, triangle4);
 
