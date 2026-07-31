@@ -157,9 +157,10 @@ int main() {
         triangle3 = Scale(triangle3, 0.7);
         DrawTriangle(pixels, triangle3);
 
-        Triangle triangle4 = Translate(triangle3, 0, 300);
-        triangle4 = Scale(triangle4, 1.0, 1.3);
-        triangle4 = Rotate(triangle4, DegToRad(115));
+        Triangle triangle4 = Translate(triangle3, 0, 275);
+        triangle4 = Scale(triangle4, 1.3, 1.5);
+        float angle = SDL_GetTicks() * 0.005f;
+        triangle4 = Rotate(triangle4, angle);
         DrawTriangle(pixels, triangle4);
 
         SDL_UpdateTexture(texture, nullptr, pixels.data(), WIDTH * sizeof(Color));
