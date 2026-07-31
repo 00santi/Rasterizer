@@ -67,6 +67,14 @@ Transform Escalation(float scale) {
             };
 }
 
+Transform Escalation(float sx, float sy) {
+    return {
+                    {sx, 0, 0},
+                    {0, sy, 0},
+                    {0, 0, 1},
+                };
+}
+
 Triangle Translate(Triangle t, float x, float y) {
     return ApplyTransform(t, Translation(x, y));
 }
@@ -88,6 +96,16 @@ Triangle Scale(Triangle t, float scale) {
     Point centroid = Centroid(t);
     Transform to_origin = Translation(-centroid.x, -centroid.y);
     Transform escalation = Escalation(scale);
+    Transform to_original = Translation(centroid.x, centroid.y);
+    Transform transform = Multiply(to_original, Multiply(escalation, to_origin));
+
+    return ApplyTransform(t, transform);
+}
+
+Triangle Scale(Triangle t, float sx, float sy) {
+    Point centroid = Centroid(t);
+    Transform to_origin = Translation(-centroid.x, -centroid.y);
+    Transform escalation = Escalation(sx, sy);
     Transform to_original = Translation(centroid.x, centroid.y);
     Transform transform = Multiply(to_original, Multiply(escalation, to_origin));
 
@@ -140,7 +158,7 @@ int main() {
         DrawTriangle(pixels, triangle3);
 
         Triangle triangle4 = Translate(triangle3, 0, 300);
-        triangle4 = Scale(triangle4, 1.3);
+        triangle4 = Scale(triangle4, 1.0, 1.3);
         triangle4 = Rotate(triangle4, DegToRad(115));
         DrawTriangle(pixels, triangle4);
 
