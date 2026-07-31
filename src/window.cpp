@@ -2,11 +2,17 @@
 #include "window.hpp"
 #include "constants.hpp"
 
-void InitSDL() {
-    if (SDL_Init(SDL_INIT_VIDEO))
-        return;
-    std::cout << "Failed to initialize SDL: " << SDL_GetError() << std::endl;
-    std::exit(1);
+std::tuple<SDL_Window*, SDL_Renderer*, SDL_Texture*> InitSDL() {
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
+        std::cout << "Failed to initialize SDL: " << SDL_GetError() << std::endl;
+        std::exit(1);
+    }
+
+    auto window = CreateWindow();
+    auto renderer = CreateRenderer(window);
+    auto texture = CreateTexture(renderer);
+
+    return {window, renderer, texture};
 }
 
 SDL_Window* CreateWindow() {
@@ -49,4 +55,11 @@ void Cleanup(SDL_Window* w, SDL_Renderer* r, SDL_Texture* t) {
     SDL_DestroyRenderer(r);
     SDL_DestroyTexture(t);
     SDL_Quit();
+}
+
+void Render(const std::vector<Color>& pixels, SDL_Renderer* renderer, SDL_Texture* texture) {
+    SDL_UpdateTexture(texture, nullptr, pixels.data(), WIDTH * sizeof(Color));
+    SDL_RenderClear(renderer);
+    SDL_RenderTexture(renderer, texture, nullptr, nullptr);
+    SDL_RenderPresent(renderer);
 }

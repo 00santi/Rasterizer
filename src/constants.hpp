@@ -1,8 +1,8 @@
 #pragma once
 #include "types.hpp"
 
-inline constexpr int WIDTH = 800;
-inline constexpr int HEIGHT = 600;
+inline constexpr int WIDTH = 933;
+inline constexpr int HEIGHT = 700;
 inline constexpr Color green {28, 232, 179, 255};
 inline constexpr Color black {0, 0, 0, 255};
 inline constexpr Color red {150, 0, 0, 255};

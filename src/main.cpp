@@ -43,38 +43,6 @@ Triangle ApplyTransform(Triangle t, Transform transform) {
     return {avex, bvex, cvex };
 }
 
-Transform Translation(float x, float y) {
-    return {
-            {1, 0, x},
-            {0, 1, y},
-            {0, 0, 1}
-    };
-}
-
-Transform Rotation(float radians) {
-    return {
-            {cos(radians), -sin(radians), 0},
-            {sin(radians), cos(radians), 0},
-            {0, 0, 1},
-        };
-}
-
-Transform Escalation(float scale) {
-    return {
-                {scale, 0, 0},
-                {0, scale, 0},
-                {0, 0, 1},
-            };
-}
-
-Transform Escalation(float sx, float sy) {
-    return {
-                    {sx, 0, 0},
-                    {0, sy, 0},
-                    {0, 0, 1},
-                };
-}
-
 Triangle Translate(Triangle t, float x, float y) {
     return ApplyTransform(t, Translation(x, y));
 }
@@ -114,11 +82,7 @@ Triangle Scale(Triangle t, float sx, float sy) {
 
 int main() {
     vector<Color> pixels(WIDTH * HEIGHT);
-
-    InitSDL();
-    auto window = CreateWindow();
-    auto renderer = CreateRenderer(window);
-    auto texture = CreateTexture(renderer);
+    auto [window, renderer, texture] = InitSDL();
 
     bool running = true;
     SDL_Event event;
@@ -135,38 +99,17 @@ int main() {
             }
         }
 
-        Point topleft {0, 0};
-        Point bottomright {799, 599};
-        DrawLine(pixels, topleft, bottomright, red);
+        DrawLine(pixels, {0, 0}, {WIDTH - 1, HEIGHT - 1}, red);
 
-        Triangle triangle {
-            {{300, 300, 1}, red},
-            {{400, 400, 1}, red},
-            {{250, 450, 1}, red}
-        };
+        constexpr Vertex v1 = {{525, 110, 1},green};
+        constexpr Vertex v2 = {{800, 75, 1}, red};
+        constexpr Vertex v3 = {{700, 300, 1}, purple};
+        Triangle triangle {v1, v2, v3};
+        const float angle = static_cast<float>(SDL_GetTicks()) * 0.005f;
+        triangle = Rotate(triangle, angle);
         DrawTriangle(pixels, triangle);
 
-        Triangle triangle2 {
-            {{700, 25, 1}, red },
-            {{400, 50, 1},green },
-            {{600, 250, 1}, purple }
-        };
-        DrawTriangle(pixels, triangle2);
-
-        Triangle triangle3 = Translate(triangle2, -300, 10);
-        triangle3 = Scale(triangle3, 0.7);
-        DrawTriangle(pixels, triangle3);
-
-        Triangle triangle4 = Translate(triangle3, 0, 275);
-        triangle4 = Scale(triangle4, 1.3, 1.5);
-        float angle = SDL_GetTicks() * 0.005f;
-        triangle4 = Rotate(triangle4, angle);
-        DrawTriangle(pixels, triangle4);
-
-        SDL_UpdateTexture(texture, nullptr, pixels.data(), WIDTH * sizeof(Color));
-        SDL_RenderClear(renderer);
-        SDL_RenderTexture(renderer, texture, nullptr, nullptr);
-        SDL_RenderPresent(renderer);
+        Render(pixels, renderer, texture);
     }
 
     Cleanup(window, renderer, texture);
