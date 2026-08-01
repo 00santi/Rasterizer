@@ -47,7 +47,7 @@ Triangle Translate(Triangle t, float x, float y) {
     return ApplyTransform(t, Translation(x, y));
 }
 
-Triangle Rotate(Triangle t, Point pivot, float radians) {
+Triangle Rotate(Triangle t, Point2 pivot, float radians) {
     Transform to_pivot = Translation(-pivot.x, -pivot.y);
     Transform rotate = Rotation(radians);
     Transform to_original = Translation(pivot.x, pivot.y);
@@ -61,7 +61,7 @@ Triangle Rotate(Triangle t, float radians) {
 }
 
 Triangle Scale(Triangle t, float scale) {
-    Point centroid = Centroid(t);
+    Point2 centroid = Centroid(t);
     Transform to_origin = Translation(-centroid.x, -centroid.y);
     Transform escalation = Escalation(scale);
     Transform to_original = Translation(centroid.x, centroid.y);
@@ -71,13 +71,57 @@ Triangle Scale(Triangle t, float scale) {
 }
 
 Triangle Scale(Triangle t, float sx, float sy) {
-    Point centroid = Centroid(t);
+    Point2 centroid = Centroid(t);
     Transform to_origin = Translation(-centroid.x, -centroid.y);
     Transform escalation = Escalation(sx, sy);
     Transform to_original = Translation(centroid.x, centroid.y);
     Transform transform = Multiply(to_original, Multiply(escalation, to_origin));
 
     return ApplyTransform(t, transform);
+}
+
+void DrawTriangle1(vector<Color> &pixels) {
+    constexpr Vertex v1 = {{525, 110, 1},green};
+    constexpr Vertex v2 = {{800, 75, 1}, red};
+    constexpr Vertex v3 = {{700, 300, 1}, purple};
+    Triangle triangle {v1, v2, v3};
+    const float angle = static_cast<float>(SDL_GetTicks()) * 0.005f;
+    triangle = Rotate(triangle, angle);
+    DrawTriangle(pixels, triangle);
+}
+
+void DrawDiagonals(vector<Color> &pixels) {
+    DrawLine(pixels,
+        0, 0,
+        WIDTH - 1, HEIGHT - 1,
+        red
+        );
+    DrawLine(pixels, 0, HEIGHT - 1,WIDTH - 1, 0, red);
+}
+
+void DrawCube(vector<Color> &pixels) {
+    Point3 p1 = {-1, 1, 4};
+    Point3 p2 = {1, 1, 4};
+    Point3 p3 = {-1, -1, 4};
+    Point3 p4 = {1, -1, 4};
+    DrawLine(pixels, p1, p2, red);
+    DrawLine(pixels, p1, p3, red);
+    DrawLine(pixels, p2, p4, red);
+    DrawLine(pixels, p3, p4, red);
+
+    Point3 p5 = {-1, 1, 5};
+    Point3 p6 = {1, 1, 5};
+    Point3 p7 = {-1, -1, 5};
+    Point3 p8 = {1, -1, 5};
+    DrawLine(pixels, p5, p6, red);
+    DrawLine(pixels, p5, p7, red);
+    DrawLine(pixels, p6, p8, red);
+    DrawLine(pixels, p7, p8, red);
+
+    DrawLine(pixels, p1, p5, red);
+    DrawLine(pixels, p2, p6, red);
+    DrawLine(pixels, p3, p7, red);
+    DrawLine(pixels, p4, p8, red);
 }
 
 int main() {
@@ -99,16 +143,9 @@ int main() {
             }
         }
 
-        DrawLine(pixels, {0, 0}, {WIDTH - 1, HEIGHT - 1}, red);
-
-        constexpr Vertex v1 = {{525, 110, 1},green};
-        constexpr Vertex v2 = {{800, 75, 1}, red};
-        constexpr Vertex v3 = {{700, 300, 1}, purple};
-        Triangle triangle {v1, v2, v3};
-        const float angle = static_cast<float>(SDL_GetTicks()) * 0.005f;
-        triangle = Rotate(triangle, angle);
-        DrawTriangle(pixels, triangle);
-
+        //DrawDiagonals(pixels);
+        //DrawTriangle1(pixels);
+        DrawCube(pixels);
         Render(pixels, renderer, texture);
     }
 

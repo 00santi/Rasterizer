@@ -10,9 +10,15 @@ struct Color {
     u8 a = 0;
 };
 
-struct Point {
+struct Point2 {
     float x = 0;
     float y = 0;
+};
+
+struct Point3 {
+    float x = 0;
+    float y = 0;
+    float z = 0;
 };
 
 struct Vec3 {

@@ -21,11 +21,11 @@ inline void SetPixel(std::vector<Color>& pixels, const int x, const int y, const
     pixels[Idx(x, y)] = color;
 }
 
-inline void SetPixel(std::vector<Color>& pixels, const Point p, const Color color) {
+inline void SetPixel(std::vector<Color>& pixels, const Point2 p, const Color color) {
     SetPixel(pixels, p.x, p.y, color);
 }
 
-inline Point Centroid(Triangle t) {
+inline Point2 Centroid(Triangle t) {
     float x = t.a.position.x + t.b.position.x + t.c.position.x;
     float y = t.a.position.y + t.b.position.y + t.c.position.y;
     x /= 3;
@@ -58,15 +58,28 @@ inline void DrawLine(vector<Color>& pixels, float x0, float y0, float x1, float 
     }
 }
 
-inline void DrawLine(vector<Color>& pixels, Point p1, Point p2, Color color) {
+inline void DrawLine(vector<Color>& pixels, Point2 p1, Point2 p2, Color color) {
     DrawLine(pixels, p1.x, p1.y, p2.x, p2.y, color);
+}
+
+Point2 Project(Point3 p) {
+    float scale = 300.0f;
+
+    return {
+        WIDTH / 2 + (p.x / p.z) * scale,
+        HEIGHT / 2 - (p.y / p.z) * scale
+    };
+}
+
+inline void DrawLine(vector<Color>& pixels, Point3 a, Point3 b, Color color) {
+    DrawLine(pixels, Project(a), Project(b), color);
 }
 
 inline float EdgeFunction(float ax, float ay, float bx, float by, float px, float py) {
     return (px - ax) * (by - ay) - (py - ay) * (bx - ax);
 }
 
-inline float EdgeFunction(Point a, Point b, Point c) {
+inline float EdgeFunction(Point2 a, Point2 b, Point2 c) {
     return EdgeFunction(a.x, a.y, b.x, b.y, c.x, c.y);
 }
 
