@@ -109,10 +109,10 @@ void DrawCube(vector<Color> &pixels) {
     DrawLine(pixels, p2, p4, red);
     DrawLine(pixels, p3, p4, red);
 
-    Point3 p5 = {-1, 1, 5};
-    Point3 p6 = {1, 1, 5};
-    Point3 p7 = {-1, -1, 5};
-    Point3 p8 = {1, -1, 5};
+    Point3 p5 = {-1, 1, 7};
+    Point3 p6 = {1, 1, 7};
+    Point3 p7 = {-1, -1, 7};
+    Point3 p8 = {1, -1, 7};
     DrawLine(pixels, p5, p6, red);
     DrawLine(pixels, p5, p7, red);
     DrawLine(pixels, p6, p8, red);
@@ -144,7 +144,7 @@ int main() {
         }
 
         //DrawDiagonals(pixels);
-        //DrawTriangle1(pixels);
+        DrawTriangle1(pixels);
         DrawCube(pixels);
         Render(pixels, renderer, texture);
     }

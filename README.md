@@ -1,1 +1,1 @@
-![screenshot](screenshot.png)
+![gif](gif.gif)
