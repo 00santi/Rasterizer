@@ -29,11 +29,11 @@ void DrawTriangle(vector<Color>& pixels, Triangle t) {
 }
 
 Vertex3 ApplyTransform (Vertex3 v, Transform2D transform) {
-    Vec3 pos = v.position;
-    return {
-        Multiply(transform, pos),
-        v.color
-    };
+    return {transform * v.position, v.color};
+}
+
+Vertex4 ApplyTransform (Vertex4 v, Transform3D transform) {
+    return {transform * transform * v.position, v.color};
 }
 
 Triangle ApplyTransform(Triangle t, Transform2D transform) {
@@ -44,8 +44,18 @@ Triangle ApplyTransform(Triangle t, Transform2D transform) {
     return {avex, bvex, cvex };
 }
 
+Point3 ApplyTransform(Point3 p, Transform3D transform) {
+    Vec4 temp {p.x, p.y, p.z, 1.0f};
+    temp = transform * temp;
+    return {temp.x, temp.y, temp.z};
+}
+
 Triangle Translate(Triangle t, float x, float y) {
     return ApplyTransform(t, Translation(x, y));
+}
+
+Point3 Translate(Point3 p, float x, float y, float z) {
+    return ApplyTransform(p, Translation(x, y, z));
 }
 
 Triangle Rotate(Triangle t, Point2 pivot, float radians) {
@@ -92,13 +102,16 @@ void DrawTriangle(vector<Color> &pixels) {
 }
 
 Point3 RotatePointY(Point3 p, Point3 pivot, float radians) {
-    /*Transform3 to_pivot(-pivot.x, -pivot.y, -pivot.z);
-    Transform3 rotation = Rotation(radians);
-    Transform3 to_original(pivot.x, pivot.y, pivot.z);
-    Transform3 transform = to_original * (rotation * to_pivot);
+    Transform3D to_pivot = Translation(-pivot.x, -pivot.y, -pivot.z);
+    Transform3D rotation = RotationY(radians);
+    Transform3D to_original = Translation(pivot.x, pivot.y, pivot.z);
+    Transform3D transform = to_original * (rotation * to_pivot);
 
-    return ApplyTransform(p, transform);*/
-    return {0,0,0};
+    return ApplyTransform(p, transform);
+}
+
+Point3 RotateY(Point3 p, float radians) {
+    return ApplyTransform(p, RotationY(radians));
 }
 
 void RotateCubeY(array<Point3, 8>& vertices, Point3 pivot, float radians) {
@@ -107,34 +120,34 @@ void RotateCubeY(array<Point3, 8>& vertices, Point3 pivot, float radians) {
     }
 }
 
+void DrawEdges(vector<Color>& pixels, array<Point3, 8>& vertices, array<pair<int, int>, 12>& edges, Color color) {
+    for (auto& [v1, v2] : edges) {
+        DrawLine(pixels, vertices[v1], vertices[v2], color);
+    }
+}
+
 void DrawCube(vector<Color> &pixels) {
-    Point3 p1 = {-1, 1, 4};
-    Point3 p2 = {1, 1, 4};
-    Point3 p3 = {-1, -1, 4};
-    Point3 p4 = {1, -1, 4};
-    DrawLine(pixels, p1, p2, red);
-    DrawLine(pixels, p1, p3, red);
-    DrawLine(pixels, p2, p4, red);
-    DrawLine(pixels, p3, p4, red);
+    Point3 p1 {-1, 1, 1};
+    Point3 p2 {1, 1, 1};
+    Point3 p3 {-1, -1, 1};
+    Point3 p4 {1, -1, 1};
+    Point3 p5 {-1, 1, -1};
+    Point3 p6 {1, 1, -1};
+    Point3 p7 {-1, -1, -1};
+    Point3 p8 {1, -1, -1};
 
-    Point3 p5 = {-1, 1, 7};
-    Point3 p6 = {1, 1, 7};
-    Point3 p7 = {-1, -1, 7};
-    Point3 p8 = {1, -1, 7};
-    DrawLine(pixels, p5, p6, red);
-    DrawLine(pixels, p5, p7, red);
-    DrawLine(pixels, p6, p8, red);
-    DrawLine(pixels, p7, p8, red);
-
-    DrawLine(pixels, p1, p5, red);
-    DrawLine(pixels, p2, p6, red);
-    DrawLine(pixels, p3, p7, red);
-    DrawLine(pixels, p4, p8, red);
-
-    array<Point3, 8> vertices {p1, p2, p3, p4, p5, p6, p7, p8};
+    array vertices {p1, p2, p3, p4, p5, p6, p7, p8};
     array<pair<int, int>, 12> edges { pair{0, 1}, {0, 2}, {1, 3}, {2, 3}, {4, 5}, {4, 6}, {5, 7}, {6, 7}, {0, 4}, {1, 5}, {2, 6}, {3, 7} };
+    const float angle = SDL_GetTicks() * 0.005f;
 
-    RotateCubeY(vertices, {}, 0);
+    for (auto& p : vertices)
+        p = RotateY(p, angle);
+
+    for (auto& p : vertices)
+        p = Translate(p, 0, 0, 5);
+
+    for (auto& [v1, v2] : edges)
+        DrawLine(pixels, vertices[v1], vertices[v2], red);
 }
 
 int main() {

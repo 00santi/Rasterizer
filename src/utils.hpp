@@ -104,14 +104,6 @@ inline Transform2D Translation(float x, float y) {
     };
 }
 
-inline Transform2D Translation(float x, float y, float z) {
-    return {
-            {1, 0, x},
-            {0, 1, y},
-            {0, 0, 1}
-    };
-}
-
 inline Transform2D Rotation(float radians) {
     return {
         {cos(radians), -sin(radians), 0},
@@ -133,5 +125,32 @@ inline Transform2D Escalation(float sx, float sy) {
         {sx, 0, 0},
         {0, sy, 0},
         {0, 0, 1}
+    };
+}
+
+inline Transform3D Translation(float x, float y, float z) {
+    return {
+        {1, 0, 0, x},
+        {0, 1, 0, y},
+        {0, 0, 1, z},
+        {0, 0, 0, 1}
+    };
+}
+
+inline Transform3D RotationY(float radians) {
+    return {
+        {cos(radians), 0, -sin(radians), 0},
+        {0, 1, 0, 0},
+        {sin(radians), 0, cos(radians), 0},
+        {0, 0, 0, 1}
+    };
+}
+
+inline Transform3D Escalation(float sx, float sy, float sz) {
+    return {
+        {sx, 0, 0, 0},
+        {0, sy, 0, 0},
+        {0, 0, sz, 0},
+        {0, 0, 0, 1}
     };
 }
