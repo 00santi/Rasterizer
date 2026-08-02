@@ -96,34 +96,42 @@ inline tuple<bool, float, float, float> InsideTriangle(Triangle t, int px, int p
     return { inside, e1 / area, e2 / area, e0 / area };
 }
 
-inline Transform Translation(float x, float y) {
+inline Transform2D Translation(float x, float y) {
     return {
-                {1, 0, x},
-                {0, 1, y},
-                {0, 0, 1}
+        {1, 0, x},
+        {0, 1, y},
+        {0, 0, 1}
     };
 }
 
-inline Transform Rotation(float radians) {
+inline Transform2D Translation(float x, float y, float z) {
     return {
-                {cos(radians), -sin(radians), 0},
-                {sin(radians), cos(radians), 0},
-                {0, 0, 1},
-            };
+            {1, 0, x},
+            {0, 1, y},
+            {0, 0, 1}
+    };
 }
 
-inline Transform Escalation(float scale) {
+inline Transform2D Rotation(float radians) {
     return {
-                    {scale, 0, 0},
-                    {0, scale, 0},
-                    {0, 0, 1},
-                };
+        {cos(radians), -sin(radians), 0},
+        {sin(radians), cos(radians), 0},
+        {0, 0, 1}
+    };
 }
 
-inline Transform Escalation(float sx, float sy) {
+inline Transform2D Escalation(float scale) {
     return {
-                        {sx, 0, 0},
-                        {0, sy, 0},
-                        {0, 0, 1},
-                    };
+        {scale, 0, 0},
+        {0, scale, 0},
+        {0, 0, 1}
+    };
+}
+
+inline Transform2D Escalation(float sx, float sy) {
+    return {
+        {sx, 0, 0},
+        {0, sy, 0},
+        {0, 0, 1}
+    };
 }

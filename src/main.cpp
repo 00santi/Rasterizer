@@ -1,3 +1,4 @@
+#include <array>
 #include <iostream>
 #include <vector>
 #include <SDL3/SDL.h>
@@ -6,7 +7,7 @@
 #include "utils.hpp"
 #include "constants.hpp"
 
-using std::vector, std::min, std::max, std::sin, std::cos;
+using std::vector, std::min, std::max, std::sin, std::cos, std::array, std::pair;
 
 void DrawTriangle(vector<Color>& pixels, Triangle t) {
     const Vec3 a = t.a.position, b = t.b.position, c = t.c.position;
@@ -27,7 +28,7 @@ void DrawTriangle(vector<Color>& pixels, Triangle t) {
     }
 }
 
-Vertex ApplyTransform (Vertex v, Transform transform) {
+Vertex3 ApplyTransform (Vertex3 v, Transform2D transform) {
     Vec3 pos = v.position;
     return {
         Multiply(transform, pos),
@@ -35,10 +36,10 @@ Vertex ApplyTransform (Vertex v, Transform transform) {
     };
 }
 
-Triangle ApplyTransform(Triangle t, Transform transform) {
-    Vertex avex = ApplyTransform(t.a, transform);
-    Vertex bvex = ApplyTransform(t.b, transform);
-    Vertex cvex = ApplyTransform(t.c, transform);
+Triangle ApplyTransform(Triangle t, Transform2D transform) {
+    Vertex3 avex = ApplyTransform(t.a, transform);
+    Vertex3 bvex = ApplyTransform(t.b, transform);
+    Vertex3 cvex = ApplyTransform(t.c, transform);
 
     return {avex, bvex, cvex };
 }
@@ -48,10 +49,10 @@ Triangle Translate(Triangle t, float x, float y) {
 }
 
 Triangle Rotate(Triangle t, Point2 pivot, float radians) {
-    Transform to_pivot = Translation(-pivot.x, -pivot.y);
-    Transform rotate = Rotation(radians);
-    Transform to_original = Translation(pivot.x, pivot.y);
-    Transform transform = Multiply(to_original, Multiply(rotate, to_pivot));
+    Transform2D to_pivot = Translation(-pivot.x, -pivot.y);
+    Transform2D rotate = Rotation(radians);
+    Transform2D to_original = Translation(pivot.x, pivot.y);
+    Transform2D transform = Multiply(to_original, Multiply(rotate, to_pivot));
 
     return ApplyTransform(t, transform);
 }
@@ -62,41 +63,48 @@ Triangle Rotate(Triangle t, float radians) {
 
 Triangle Scale(Triangle t, float scale) {
     Point2 centroid = Centroid(t);
-    Transform to_origin = Translation(-centroid.x, -centroid.y);
-    Transform escalation = Escalation(scale);
-    Transform to_original = Translation(centroid.x, centroid.y);
-    Transform transform = Multiply(to_original, Multiply(escalation, to_origin));
+    Transform2D to_origin = Translation(-centroid.x, -centroid.y);
+    Transform2D escalation = Escalation(scale);
+    Transform2D to_original = Translation(centroid.x, centroid.y);
+    Transform2D transform = Multiply(to_original, Multiply(escalation, to_origin));
 
     return ApplyTransform(t, transform);
 }
 
 Triangle Scale(Triangle t, float sx, float sy) {
     Point2 centroid = Centroid(t);
-    Transform to_origin = Translation(-centroid.x, -centroid.y);
-    Transform escalation = Escalation(sx, sy);
-    Transform to_original = Translation(centroid.x, centroid.y);
-    Transform transform = Multiply(to_original, Multiply(escalation, to_origin));
+    Transform2D to_origin = Translation(-centroid.x, -centroid.y);
+    Transform2D escalation = Escalation(sx, sy);
+    Transform2D to_original = Translation(centroid.x, centroid.y);
+    Transform2D transform = to_original * (escalation * to_origin);
 
     return ApplyTransform(t, transform);
 }
 
-void DrawTriangle1(vector<Color> &pixels) {
-    constexpr Vertex v1 = {{525, 110, 1},green};
-    constexpr Vertex v2 = {{800, 75, 1}, red};
-    constexpr Vertex v3 = {{700, 300, 1}, purple};
-    Triangle triangle {v1, v2, v3};
-    const float angle = static_cast<float>(SDL_GetTicks()) * 0.005f;
+void DrawTriangle(vector<Color> &pixels) {
+    constexpr Vec3 v1 {525, 110, 1}, v2 {800, 75, 1}, v3 {700, 300, 1};
+    constexpr Vertex3 vx1 {v1, green}, vx2 {v2, red}, vx3 {v3, purple};
+    Triangle triangle {vx1, vx2, vx3};
+
+    const float angle = SDL_GetTicks() * 0.005f;
     triangle = Rotate(triangle, angle);
     DrawTriangle(pixels, triangle);
 }
 
-void DrawDiagonals(vector<Color> &pixels) {
-    DrawLine(pixels,
-        0, 0,
-        WIDTH - 1, HEIGHT - 1,
-        red
-        );
-    DrawLine(pixels, 0, HEIGHT - 1,WIDTH - 1, 0, red);
+Point3 RotatePointY(Point3 p, Point3 pivot, float radians) {
+    /*Transform3 to_pivot(-pivot.x, -pivot.y, -pivot.z);
+    Transform3 rotation = Rotation(radians);
+    Transform3 to_original(pivot.x, pivot.y, pivot.z);
+    Transform3 transform = to_original * (rotation * to_pivot);
+
+    return ApplyTransform(p, transform);*/
+    return {0,0,0};
+}
+
+void RotateCubeY(array<Point3, 8>& vertices, Point3 pivot, float radians) {
+    for (Point3& p : vertices) {
+        p = RotatePointY(p, pivot, radians);
+    }
 }
 
 void DrawCube(vector<Color> &pixels) {
@@ -122,6 +130,11 @@ void DrawCube(vector<Color> &pixels) {
     DrawLine(pixels, p2, p6, red);
     DrawLine(pixels, p3, p7, red);
     DrawLine(pixels, p4, p8, red);
+
+    array<Point3, 8> vertices {p1, p2, p3, p4, p5, p6, p7, p8};
+    array<pair<int, int>, 12> edges { pair{0, 1}, {0, 2}, {1, 3}, {2, 3}, {4, 5}, {4, 6}, {5, 7}, {6, 7}, {0, 4}, {1, 5}, {2, 6}, {3, 7} };
+
+    RotateCubeY(vertices, {}, 0);
 }
 
 int main() {
@@ -143,8 +156,7 @@ int main() {
             }
         }
 
-        //DrawDiagonals(pixels);
-        DrawTriangle1(pixels);
+        DrawTriangle(pixels);
         DrawCube(pixels);
         Render(pixels, renderer, texture);
     }
