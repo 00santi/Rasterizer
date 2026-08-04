@@ -33,7 +33,7 @@ Vertex3 ApplyTransform (Vertex3 v, Transform2D transform) {
 }
 
 Vertex4 ApplyTransform (Vertex4 v, Transform3D transform) {
-    return {transform * transform * v.position, v.color};
+    return {transform * v.position, v.color};
 }
 
 Triangle ApplyTransform(Triangle t, Transform2D transform) {
