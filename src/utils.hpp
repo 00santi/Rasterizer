@@ -137,11 +137,29 @@ inline Transform3D Translation(float x, float y, float z) {
     };
 }
 
+inline Transform3D RotationX(float radians) {
+    return {
+        {1, 0, 0, 0},
+        {0, cos(radians), sin(radians), 0},
+        {0, -sin(radians), cos(radians), 0},
+        {0, 0, 0, 1}
+    };
+}
+
 inline Transform3D RotationY(float radians) {
     return {
         {cos(radians), 0, -sin(radians), 0},
         {0, 1, 0, 0},
         {sin(radians), 0, cos(radians), 0},
+        {0, 0, 0, 1}
+    };
+}
+
+inline Transform3D RotationZ(float radians) {
+    return {
+        {cos(radians), sin(radians), 0, 0},
+        {-sin(radians), cos(radians), 0, 0},
+        {0, 0, 1, 0},
         {0, 0, 0, 1}
     };
 }

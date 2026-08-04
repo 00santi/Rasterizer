@@ -71,16 +71,6 @@ Triangle Rotate(Triangle t, float radians) {
     return Rotate(t, Centroid(t), radians);
 }
 
-Triangle Scale(Triangle t, float scale) {
-    Point2 centroid = Centroid(t);
-    Transform2D to_origin = Translation(-centroid.x, -centroid.y);
-    Transform2D escalation = Escalation(scale);
-    Transform2D to_original = Translation(centroid.x, centroid.y);
-    Transform2D transform = Multiply(to_original, Multiply(escalation, to_origin));
-
-    return ApplyTransform(t, transform);
-}
-
 Triangle Scale(Triangle t, float sx, float sy) {
     Point2 centroid = Centroid(t);
     Transform2D to_origin = Translation(-centroid.x, -centroid.y);
@@ -89,6 +79,10 @@ Triangle Scale(Triangle t, float sx, float sy) {
     Transform2D transform = to_original * (escalation * to_origin);
 
     return ApplyTransform(t, transform);
+}
+
+Triangle Scale(Triangle t, float scale) {
+    return Scale(t, scale, scale);
 }
 
 void DrawTriangle(vector<Color> &pixels) {
@@ -101,29 +95,16 @@ void DrawTriangle(vector<Color> &pixels) {
     DrawTriangle(pixels, triangle);
 }
 
-Point3 RotatePointY(Point3 p, Point3 pivot, float radians) {
-    Transform3D to_pivot = Translation(-pivot.x, -pivot.y, -pivot.z);
-    Transform3D rotation = RotationY(radians);
-    Transform3D to_original = Translation(pivot.x, pivot.y, pivot.z);
-    Transform3D transform = to_original * (rotation * to_pivot);
-
-    return ApplyTransform(p, transform);
+Point3 RotateX(Point3 p, float radians) {
+    return ApplyTransform(p, RotationX(radians));
 }
 
 Point3 RotateY(Point3 p, float radians) {
     return ApplyTransform(p, RotationY(radians));
 }
 
-void RotateCubeY(array<Point3, 8>& vertices, Point3 pivot, float radians) {
-    for (Point3& p : vertices) {
-        p = RotatePointY(p, pivot, radians);
-    }
-}
-
-void DrawEdges(vector<Color>& pixels, array<Point3, 8>& vertices, array<pair<int, int>, 12>& edges, Color color) {
-    for (auto& [v1, v2] : edges) {
-        DrawLine(pixels, vertices[v1], vertices[v2], color);
-    }
+Point3 RotateZ(Point3 p, float radians) {
+    return ApplyTransform(p, RotationZ(radians));
 }
 
 void DrawCube(vector<Color> &pixels) {
@@ -142,6 +123,9 @@ void DrawCube(vector<Color> &pixels) {
 
     for (auto& p : vertices)
         p = RotateY(p, angle);
+
+    for (auto& p : vertices)
+        p = RotateZ(p, angle);
 
     for (auto& p : vertices)
         p = Translate(p, 0, 0, 5);
