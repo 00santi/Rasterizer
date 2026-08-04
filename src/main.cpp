@@ -122,10 +122,10 @@ void DrawCube(vector<Color> &pixels) {
     const float angle = SDL_GetTicks() * 0.005f;
 
     for (auto& p : vertices)
-        p = RotateY(p, angle);
+        p = RotateZ(p, angle);
 
     for (auto& p : vertices)
-        p = RotateZ(p, angle);
+        p = RotateY(p, angle);
 
     for (auto& p : vertices)
         p = Translate(p, 0, 0, 5);

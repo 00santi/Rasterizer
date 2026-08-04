@@ -89,3 +89,7 @@ inline Mat4 operator*(const Mat4& A, const Mat4& B) {
 inline Vec4 operator*(const Mat4& A, const Vec4& b) {
     return Multiply(A, b);
 }
+
+struct Camera {
+    Point3 position {};
+};
