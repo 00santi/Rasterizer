@@ -14,11 +14,10 @@ inline void Clear(std::vector<Color>& pixels, const Color color) {
 }
 
 inline void SetPixel(std::vector<Color>& pixels, const int x, const int y, const Color color) {
-    if (x < 0 || y < 0 || x >= WIDTH || y >= HEIGHT) {
-        std::cout << "Out of bounds, x: " << x << ", y: " << y << std::endl;
-        return;
-    }
-    pixels[Idx(x, y)] = color;
+    if (x < 0 || y < 0 || x >= WIDTH || y >= HEIGHT)
+        std::cout << "Out of bounds, x: " << x << ", y: " << y << '\n';
+    else
+        pixels[Idx(x, y)] = color;
 }
 
 inline void SetPixel(std::vector<Color>& pixels, const Point2 p, const Color color) {
@@ -37,68 +36,49 @@ inline float DegToRad(const float degrees) {
     return degrees * 0.0174533f;
 }
 
-using std::vector, std::max, std::min, std::abs;
-inline void DrawLine(vector<Color>& pixels, const float x0, const float y0, const float x1, const float y1, const Color color) {
-    const float dy = y1 - y0, dx = x1 - x0;
-    const int steps = max(abs(dx), abs(dy));
-
-    if (steps == 0) {
-        SetPixel(pixels, x0, y0, color);
-        return;
-    }
-
-    const float ystep = dy / steps;
-    const float xstep = dx / steps;
-
-    float y = y0, x = x0;
-    for (int i = 0; i <= steps; i++) {
-        SetPixel(pixels, x, y, color);
-        y += ystep;
-        x += xstep;
-    }
-}
-
-inline void DrawLine(vector<Color>& pixels, const Point2 p1, const Point2 p2, const Color color) {
-    DrawLine(pixels, p1.x, p1.y, p2.x, p2.y, color);
-}
-
-inline Point2 Project(const Point3& p) {
+inline Point2 Project(const float x, const float y, const float z) {
     constexpr float scale = 300.0f;
 
     return {
-        WIDTH / 2 + (p.x / p.z) * scale,
-        HEIGHT / 2 - (p.y / p.z) * scale
+        WIDTH / 2 + (x / z) * scale,
+        HEIGHT / 2 - (y / z) * scale
     };
 }
 
-inline void DrawLine(vector<Color>& pixels, const Point3& a, const Point3& b, const Color color) {
-    DrawLine(pixels, Project(a), Project(b), color);
+inline Point2 Project(const Point3& p) {
+    return Project(p.x, p.y, p.z);
 }
 
-inline void DrawLine(vector<Color>& pixels, const Vertex4& a, const Vertex4& b) {
-    const auto [x0, y0] = Project({a.position.x, a.position.y, a.position.z});
-    const auto [x1, y1] = Project({b.position.x, b.position.y, b.position.z});
+inline Point2 Project(const Vec4& p) {
+    return Project(p.x, p.y, p.z);
+}
 
-    const float dy = y1 - y0, dx = x1 - x0;
+using std::vector, std::max, std::min, std::abs;
+inline void DrawLine(vector<Color>& pixels, const Point2& a, const Color& a_color, const Point2& b, const Color& b_color) {
+    const float dy = b.y - a.y, dx = b.x - a.x;
     const int steps = max(abs(dx), abs(dy));
 
     if (steps == 0) {
-        const Color color = a.color * 0.5 + b.color * 0.5;
-        SetPixel(pixels, x0, y0, color);
+        const Color color = a_color * 0.5 + b_color * 0.5;
+        SetPixel(pixels, a.x, a.y, color);
         return;
     }
 
     const float ystep = dy / steps;
     const float xstep = dx / steps;
 
-    float y = y0, x = x0;
+    float y = a.y, x = a.x;
     for (int i = 0; i <= steps; i++) {
         const float t = static_cast<float>(i) / steps;
-        const Color color = a.color * (1 - t) + b.color * t;
+        const Color color = a_color * (1 - t) + b_color * t;
         SetPixel(pixels, x, y, color);
         y += ystep;
         x += xstep;
     }
+}
+
+inline void DrawLine(vector<Color>& pixels, const Vertex4& a, const Vertex4& b) {
+    DrawLine(pixels, Project(a.position), a.color, Project(b.position), b.color);
 }
 
 inline float EdgeFunction(const float ax, const float ay, const float bx, const float by, const float px, const float py) {
@@ -156,15 +136,7 @@ inline Transform2D Rotation(const float radians) {
     };
 }
 
-inline Transform2D Escalation(const float scale) {
-    return {
-        {scale, 0, 0},
-        {0, scale, 0},
-        {0, 0, 1}
-    };
-}
-
-inline Transform2D Escalation(const float sx, const float sy) {
+inline Transform2D Scale(const float sx, const float sy) {
     return {
         {sx, 0, 0},
         {0, sy, 0},
@@ -208,7 +180,7 @@ inline Transform3D RotationZ(const float radians) {
     };
 }
 
-inline Transform3D Escalation(const float sx, const float sy, const float sz) {
+inline Transform3D Scale(const float sx, const float sy, const float sz) {
     return {
         {sx, 0, 0, 0},
         {0, sy, 0, 0},

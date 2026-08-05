@@ -25,67 +25,16 @@ Triangle ApplyTransform(Triangle t, Transform2D transform) {
     return {avex, bvex, cvex };
 }
 
-Point3 ApplyTransform(Point3 p, Transform3D transform) {
-    Vec4 temp {p.x, p.y, p.z, 1.0f};
-    temp = transform * temp;
-    return {temp.x, temp.y, temp.z};
-}
-
-Triangle Translate(Triangle t, float x, float y) {
-    return ApplyTransform(t, Translation(x, y));
-}
-
-Point3 Translate(Point3 p, float x, float y, float z) {
-    return ApplyTransform(p, Translation(x, y, z));
-}
-
-Triangle Rotate(Triangle t, Point2 pivot, float radians) {
-    Transform2D to_pivot = Translation(-pivot.x, -pivot.y);
-    Transform2D rotate = Rotation(radians);
-    Transform2D to_original = Translation(pivot.x, pivot.y);
-    Transform2D transform = Multiply(to_original, Multiply(rotate, to_pivot));
-
-    return ApplyTransform(t, transform);
-}
-
-Triangle Rotate(Triangle t, float radians) {
-    return Rotate(t, Centroid(t), radians);
-}
-
-Triangle Scale(Triangle t, float sx, float sy) {
-    Point2 centroid = Centroid(t);
-    Transform2D to_origin = Translation(-centroid.x, -centroid.y);
-    Transform2D escalation = Escalation(sx, sy);
-    Transform2D to_original = Translation(centroid.x, centroid.y);
-    Transform2D transform = to_original * (escalation * to_origin);
-
-    return ApplyTransform(t, transform);
-}
-
-Triangle Scale(Triangle t, float scale) {
-    return Scale(t, scale, scale);
-}
-
 void DrawTriangle(vector<Color> &pixels) {
     constexpr Vec3 v1 {525, 110, 1}, v2 {800, 75, 1}, v3 {700, 300, 1};
     constexpr Vertex3 vx1 {v1, green}, vx2 {v2, red}, vx3 {v3, purple};
     Triangle triangle {vx1, vx2, vx3};
 
-    const float angle = SDL_GetTicks() * 0.005f;
-    triangle = Rotate(triangle, angle);
+    const float angle = SDL_GetTicks() * 0.002f;
+    const auto [cx, cy] = Centroid(triangle);
+    const Transform2D model = Translation(cx, cy) * (Rotation(angle) * Translation(-cx, -cy));
+    triangle = ApplyTransform(triangle, model);
     DrawTriangle(pixels, triangle);
-}
-
-Point3 RotateX(Point3 p, float radians) {
-    return ApplyTransform(p, RotationX(radians));
-}
-
-Point3 RotateY(Point3 p, float radians) {
-    return ApplyTransform(p, RotationY(radians));
-}
-
-Point3 RotateZ(Point3 p, float radians) {
-    return ApplyTransform(p, RotationZ(radians));
 }
 
 void DrawCube(vector<Color> &pixels) {
