@@ -10,6 +10,28 @@ struct Color {
     u8 a = 0;
 };
 
+inline Color operator*(const float weight, const Color& c) {
+    return {
+        static_cast<u8>(c.r * weight),
+        static_cast<u8>(c.g * weight),
+        static_cast<u8>(c.b * weight),
+        static_cast<u8>(c.a * weight),
+    };
+}
+
+inline Color operator*(const Color& c, const float weight) {
+    return weight * c;
+}
+
+inline Color operator+(const Color& c1, const Color& c2) {
+    return {
+        static_cast<u8>(c1.r + c2.r),
+        static_cast<u8>(c1.g + c2.g),
+        static_cast<u8>(c1.b + c2.b),
+        static_cast<u8>(c1.a + c2.a),
+    };
+}
+
 struct Point2 {
     float x = 0;
     float y = 0;
@@ -24,14 +46,14 @@ struct Point3 {
 struct Vec3 {
     float x = 0;
     float y = 0;
-    float w = 0;
+    float w = 1;
 };
 
 struct Vec4 {
     float x = 0;
     float y = 0;
     float z = 0;
-    float w = 0;
+    float w = 1;
 };
 
 struct Vertex3 {

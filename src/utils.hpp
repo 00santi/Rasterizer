@@ -37,7 +37,7 @@ inline float DegToRad(const float degrees) {
     return degrees * 0.0174533f;
 }
 
-using std::vector, std::max, std::abs;
+using std::vector, std::max, std::min, std::abs;
 inline void DrawLine(vector<Color>& pixels, const float x0, const float y0, const float x1, const float y1, const Color color) {
     const float dy = y1 - y0, dx = x1 - x0;
     const int steps = max(abs(dx), abs(dy));
@@ -75,6 +75,32 @@ inline void DrawLine(vector<Color>& pixels, const Point3& a, const Point3& b, co
     DrawLine(pixels, Project(a), Project(b), color);
 }
 
+inline void DrawLine(vector<Color>& pixels, const Vertex4& a, const Vertex4& b) {
+    const auto [x0, y0] = Project({a.position.x, a.position.y, a.position.z});
+    const auto [x1, y1] = Project({b.position.x, b.position.y, b.position.z});
+
+    const float dy = y1 - y0, dx = x1 - x0;
+    const int steps = max(abs(dx), abs(dy));
+
+    if (steps == 0) {
+        const Color color = a.color * 0.5 + b.color * 0.5;
+        SetPixel(pixels, x0, y0, color);
+        return;
+    }
+
+    const float ystep = dy / steps;
+    const float xstep = dx / steps;
+
+    float y = y0, x = x0;
+    for (int i = 0; i <= steps; i++) {
+        const float t = static_cast<float>(i) / steps;
+        const Color color = a.color * (1 - t) + b.color * t;
+        SetPixel(pixels, x, y, color);
+        y += ystep;
+        x += xstep;
+    }
+}
+
 inline float EdgeFunction(const float ax, const float ay, const float bx, const float by, const float px, const float py) {
     return (px - ax) * (by - ay) - (py - ay) * (bx - ax);
 }
@@ -94,6 +120,24 @@ inline tuple<bool, float, float, float> InsideTriangle(const Triangle& t, const 
     const float area = EdgeFunction(a.x, a.y, b.x, b.y, c.x, c.y);
     if (area == 0 || !inside) return tuple{false, 0, 0, 0};
     return { inside, e1 / area, e2 / area, e0 / area };
+}
+
+void DrawTriangle(vector<Color>& pixels, Triangle t) {
+    const Vec3 a = t.a.position, b = t.b.position, c = t.c.position;
+    int left = min(a.x, min(b.x, c.x));
+    int right = max(a.x, max(b.x, c.x));
+    int top = min(a.y, min(b.y, c.y));
+    int bottom = max(a.y, max(b.y, c.y));
+
+    for (int y = top; y <= bottom; y++) {
+        for (int x = left; x <= right; x++) {
+            auto [inside, wA, wB, wC] = InsideTriangle(t, x, y);
+            if (!inside)
+                continue;
+            const Color color = wA * t.a.color + wB * t.b.color + wC * t.c.color;
+            SetPixel(pixels, x, y, color);
+        }
+    }
 }
 
 inline Transform2D Translation(const float x, const float y) {

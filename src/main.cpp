@@ -9,25 +9,6 @@
 
 using std::vector, std::min, std::max, std::sin, std::cos, std::array, std::pair;
 
-void DrawTriangle(vector<Color>& pixels, Triangle t) {
-    const Vec3 a = t.a.position, b = t.b.position, c = t.c.position;
-    int left = min(a.x, min(b.x, c.x));
-    int right = max(a.x, max(b.x, c.x));
-    int top = min(a.y, min(b.y, c.y));
-    int bottom = max(a.y, max(b.y, c.y));
-
-    for (int y = top; y <= bottom; y++) {
-        for (int x = left; x <= right; x++) {
-            auto [inside, wA, wB, wC] = InsideTriangle(t, x, y);
-            if (!inside) continue;
-            u8 R = wA * t.a.color.r + wB * t.b.color.r + wC * t.c.color.r;
-            u8 G = wA * t.a.color.g + wB * t.b.color.g + wC * t.c.color.g;
-            u8 B = wA * t.a.color.b + wB * t.b.color.b + wC * t.c.color.b;
-            SetPixel(pixels, x, y, Color{R, G, B, 255});
-        }
-    }
-}
-
 Vertex3 ApplyTransform (Vertex3 v, Transform2D transform) {
     return {transform * v.position, v.color};
 }
@@ -108,30 +89,26 @@ Point3 RotateZ(Point3 p, float radians) {
 }
 
 void DrawCube(vector<Color> &pixels) {
-    Point3 p1 {-1, 1, 1};
-    Point3 p2 {1, 1, 1};
-    Point3 p3 {-1, -1, 1};
-    Point3 p4 {1, -1, 1};
-    Point3 p5 {-1, 1, -1};
-    Point3 p6 {1, 1, -1};
-    Point3 p7 {-1, -1, -1};
-    Point3 p8 {1, -1, -1};
+    Vertex4 p1 { Vec4{-1, 1, 1}, red};
+    Vertex4 p2 { Vec4{1, 1, 1}, blue};
+    Vertex4 p3 { Vec4{-1, -1, 1}, yellow};
+    Vertex4 p4 { Vec4{1, -1, 1}, pink};
+    Vertex4 p5 { Vec4{-1, 1, -1}, white};
+    Vertex4 p6 { Vec4{1, 1, -1}, lavender};
+    Vertex4 p7 { Vec4{-1, -1, -1}, purple};
+    Vertex4 p8 { Vec4{1, -1, -1}, green};
 
     array vertices {p1, p2, p3, p4, p5, p6, p7, p8};
     array<pair<int, int>, 12> edges { pair{0, 1}, {0, 2}, {1, 3}, {2, 3}, {4, 5}, {4, 6}, {5, 7}, {6, 7}, {0, 4}, {1, 5}, {2, 6}, {3, 7} };
-    const float angle = SDL_GetTicks() * 0.005f;
+    const float angle = SDL_GetTicks() * 0.0005f;
+
+    Transform3D model = Translation(0, 0, 5) * (RotationZ(angle) * RotationY(angle));
 
     for (auto& p : vertices)
-        p = RotateZ(p, angle);
-
-    for (auto& p : vertices)
-        p = RotateY(p, angle);
-
-    for (auto& p : vertices)
-        p = Translate(p, 0, 0, 5);
+        p = ApplyTransform(p, model);
 
     for (auto& [v1, v2] : edges)
-        DrawLine(pixels, vertices[v1], vertices[v2], red);
+        DrawLine(pixels, vertices[v1], vertices[v2]);
 }
 
 int main() {
